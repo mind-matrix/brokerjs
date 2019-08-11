@@ -1,0 +1,29 @@
+{
+  "name": "brokerjs",
+  "version": "1.0.0",
+  "description": "A reactive solution to passing data between WebSocket Server and Client using Data Models",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kenwayr/brokerjs.git"
+  },
+  "keywords": [
+    "websocket"
+  ],
+  "author": "Sagnik Modak",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kenwayr/brokerjs/issues"
+  },
+  "homepage": "https://github.com/kenwayr/brokerjs#readme",
+  "dependencies": {
+    "uniqid": "^5.0.3"
+  },
+  "devDependencies": {
+    "express": "^4.17.1",
+    "ws": "^7.1.1"
+  }
+}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Server Time: </h1>
+    <span id="time"></span>
+<script src="./broker.js"></script>
+<script>
+var time = document.getElementById('time');
+var connection = new WebSocket('ws://' + location.host);
+var broker = new Broker({
+    user: {
+        tick: Date.now()
+    },
+    server: {
+        sent: false,
+        message: ''
+    }
+});
+var bconn = broker.subscribe(connection, 'user');
+bconn.on("message", (message) => {
+    console.log(message);
+});
+</script>
+</body>
+</html>
