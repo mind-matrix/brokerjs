@@ -3,7 +3,7 @@ A reactive solution to passing data between WebSocket Server and Client using Da
 ## Installation
 Using npm
 ```cmd
-npm install brokerjs
+npm install @mindmatrix/brokerjs
 ```
 I am working on a Vanilla JS distribution but for now you can use Webpack for the client-side. See example in *demo* folder.
 
