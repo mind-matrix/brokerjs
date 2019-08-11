@@ -135,5 +135,5 @@ wss.on('connection', function(ws) {
 
 # License
 
-Copyright (c) 2019 Sagnik Modak
-This content is released under [https://opensource.org/licenses/MIT](MIT License)
+Copyright (c) 2019 [Sagnik Modak](https://github.com/mind-matrix)
+This content is released under [MIT License](https://opensource.org/licenses/MIT)
