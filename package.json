@@ -1,6 +1,6 @@
 {
   "name": "@mindmatrix/brokerjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A reactive solution to passing data between WebSocket Server and Client using Data Models",
   "main": "index.js",
   "scripts": {
