@@ -3,29 +3,29 @@ const uniqid = require('uniqid');
 class BrokeredConnection {
     constructor(connection, brokerCallback = () => {}) {
         this.id = uniqid();
+        this.brokered = true;
         this.connection = connection;
         this.brokerCallback = brokerCallback;
         this.onopenCallbacks = [];
         this.onmessageCallbacks = [];
         this.oncloseCallbacks = [];
-        this.connection.on('open', () => {
+        this.connection.onopen = () => {
             for(var i=0; i < this.onopenCallbacks.length; i++)
                 this.onopenCallbacks[i]();
-        });
-        this.connection.on('message', (message) => {
-            var msg = JSON.parse(message);
+        };
+        this.connection.onmessage = (message) => {
+            var msg = JSON.parse(message.data);
             if(msg.t === 0)
                 this.brokerCallback(msg.d);
             else {
-                message = msg.d;
                 for(var i=0; i < this.onmessageCallbacks.length; i++)
-                    this.onmessageCallbacks[i](message);
+                    this.onmessageCallbacks[i](msg.d);
             }
-        });
-        this.connection.on('close', () => {
+        };
+        this.connection.onclose = () => {
             for(var i=0; i < this.oncloseCallbacks.length; i++)
                 this.oncloseCallbacks[i]();
-        });
+        };
     }
     on(event, callback) {
         if(event === 'open')
@@ -121,14 +121,24 @@ module.exports = class Broker {
             }
         }
     }
-    subscribe(connection, modelName) {
-        var brokered_connection = new BrokeredConnection(connection, (data) => {
+    createFrom(connection) {
+        return new BrokeredConnection(connection, (data) => {
             this.set(data, this.models);
         });
+    }
+    subscribe(connection, modelName) {
+        var brokered_connection;
+        if(!connection.brokered) {
+            brokered_connection = new BrokeredConnection(connection, (data) => {
+                this.set(data, this.models);
+            });
+        }
+        else
+            brokered_connection = connection;
         this.subscribers[modelName].push(brokered_connection);
-        return brokered_connection; //add broker callback later
+        return brokered_connection;
     }
     unsubscribe(brokered_connection, modelName) {
-        this.subscribers[modelName] = this.subscribers[modelName].filter((conn) => conn.id !== brokered_connection.id)
+        this.subscribers[modelName] = this.subscribers[modelName].filter((conn) => conn.id !== brokered_connection.id);
     }
 }

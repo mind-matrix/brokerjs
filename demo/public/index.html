@@ -4,28 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Broker Demo</title>
+    <link rel="stylesheet" href="./app.css">
 </head>
 <body>
-    <h1>Server Time: </h1>
-    <span id="time"></span>
-<script src="./broker.js"></script>
-<script>
-var time = document.getElementById('time');
-var connection = new WebSocket('ws://' + location.host);
-var broker = new Broker({
-    user: {
-        tick: Date.now()
-    },
-    server: {
-        sent: false,
-        message: ''
-    }
-});
-var bconn = broker.subscribe(connection, 'user');
-bconn.on("message", (message) => {
-    console.log(message);
-});
-</script>
+    <div class="group">
+        <input type="text" id="message" required="required"/>
+        <span class="highlight"></span>
+        <span class="bar"></span>
+        <label>Message</label>
+    </div>
+    <button id="send" class="btn btn-submit">send</button>
+    <h3>Last Message To Server: </h3>
+    <p id="messageDisplay">
+        --- Enter a message to display here ---
+    </p>
+<script src="./bundle.js"></script>
 </body>
 </html>
