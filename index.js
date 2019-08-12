@@ -9,6 +9,7 @@ class BrokeredConnection {
         this.onopenCallbacks = [];
         this.onmessageCallbacks = [];
         this.oncloseCallbacks = [];
+        this.requestCallbacks = new Map();
         this.connection.onopen = () => {
             for(var i=0; i < this.onopenCallbacks.length; i++)
                 this.onopenCallbacks[i]();
@@ -18,8 +19,12 @@ class BrokeredConnection {
             if(msg.t === 0)
                 this.brokerCallback(msg.d);
             else {
+                if(msg.c && this.requestCallbacks.has(msg.c)) {
+                    this.requestCallbacks.get(msg.c)(msg.d);
+                    this.requestCallbacks.delete(msg.c);
+                }
                 for(var i=0; i < this.onmessageCallbacks.length; i++)
-                    this.onmessageCallbacks[i](msg.d);
+                    this.onmessageCallbacks[i](msg.d, msg);
             }
         };
         this.connection.onclose = () => {
@@ -35,11 +40,30 @@ class BrokeredConnection {
         else if(event === 'close')
             this.oncloseCallbacks.push(callback);
     }
-    send(message) {
-        this.connection.send(JSON.stringify({
+    send(message, callback = null) {
+        var uid = uniqid();
+        var msg = {
             t: 1,
             d: message
-        }));
+        };
+        if(callback) {
+            this.requestCallbacks.set(uid, callback);
+            msg.c = uid;
+        }
+        this.connection.send(JSON.stringify(msg));
+        return msg.c || true;
+    }
+    reply(message_event, reply) {
+        if(message_event.c) {
+            var msg = {
+                t: 1,
+                d: reply,
+                c: message_event.c
+            };
+            this.connection.send(JSON.stringify(msg));
+        }
+        else
+            throw new Error("Cannot reply to no-reply messages");
     }
     sendBrokerMessage(data) {
         this.connection.send(JSON.stringify({

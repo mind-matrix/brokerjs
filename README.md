@@ -12,7 +12,7 @@ Make sure all dependencies are resolved and that mocha and chai are installed.
 ```cmd
 npm test
 ```
-There are currently only about 5 test cases. I will add more test cases soon.
+There are currently only 10 test cases. I will add more test cases soon.
 
 ## Demonstration
 
@@ -100,6 +100,8 @@ console.log(broker.models.myprop); // prints value of `myprop` key at that insta
 
 **Note:** As a friendly reminder, you probably do not want to listen to any key that you are writing to on either side. For example, this should not be what you intend to do:
 
+*Server*
+
 ```js
 var models = {
     prop: 'val'
@@ -107,8 +109,22 @@ var models = {
 var broker = new Broker(models);
 wss.on('connection', function(ws) {
     var bws = broker.subscribe(ws, 'prop');
-    broker.models.prop = 'newval'; // probably not a good idea
 });
+```
+
+*Client*
+
+```js
+var models = {
+    prop: 'val'
+};
+var broker = new Broker(models);
+var ws = new WebSocket('ws://localhost:8080');
+var bws = broker.createFrom(ws);
+/*
+ ... your code
+*/
+broker.models.prop = 'val'; //not what you wanna do
 ```
 
 The brokered connection can still accept and send normal messages too! Just like a normal WebSocket connection.
@@ -122,7 +138,22 @@ wss.on('connection', function(ws) {
 });
 ```
 
-Finally, it is a good practice to unsubscribe the connection when it is closed. This is reduce a little overhead of saving unusable connection information. Just a little house cleaning.
+As an added benefit, BrokerJS allows you to send messages *and* receive replies in callbacks.
+
+```js
+bws.send("Hi", (reply) => {
+    console.log(reply); // prints `Hello` to console
+});
+```
+
+```js
+bws.on('message', (message, e) => {
+    console.log(message); // prints `Hi` to console
+    bws.reply(e, "Hello");
+});
+```
+
+Finally, it is a good practice to unsubscribe the connection when it is closed. This reduces a little overhead of saving unusable connection information. Just a little house cleaning.
 
 ```js
 wss.on('connection', function(ws) {
@@ -136,4 +167,5 @@ wss.on('connection', function(ws) {
 # License
 
 Copyright (c) 2019 [Sagnik Modak](https://github.com/mind-matrix)
+
 This content is released under [MIT License](https://opensource.org/licenses/MIT)
